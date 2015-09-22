@@ -2,7 +2,8 @@ class StringCalculator
 
   def initialize(string)
     @string = string
-    @delimiter = @string[/^\/\/\[?(.+)\]?\n/m, 1]
+    @delimiter = @string[/^\/\/(.+)\n/m, 1].to_s
+    @delimiters = @delimiter.tr('[', '').split(']')
   end
 
   def add
@@ -59,6 +60,10 @@ RSpec.describe "string_calculator_text" do
 
   it "allows delimiters of any length" do
     expect(StringCalculator.new("//[***]\n1***2***3").add).to eq(6)
+  end
+
+  it "allows multiple delimiters" do
+    expect(StringCalculator.new("//[*][%]\n1*2%3").add).to eq(6)
   end
 
 end
