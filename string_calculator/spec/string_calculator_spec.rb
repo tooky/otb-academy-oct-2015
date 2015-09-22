@@ -2,12 +2,12 @@ class StringCalculator
 
   def initialize(string)
     @string = string
-    @delimiter = @string[/^\/\/(.)\n/m, 1]
+    @delimiter = @string[/^\/\/\[?(.+)\]?\n/m, 1]
   end
 
   def add
     negatives = []
-    result = @string.split(/[\n,#{@delimiter}]/).inject(0) do |sum, num|
+    result = @string.split(/[\n,#{Regexp.escape(@delimiter.to_s)}]/).inject(0) do |sum, num|
       negatives << num.strip if num.to_i < 0
       sum += num.to_i if num.to_i <= 1000
       sum
@@ -55,6 +55,10 @@ RSpec.describe "string_calculator_text" do
 
   it "ignores numbers that are greater than 1000" do
     expect(StringCalculator.new("2,1001").add).to eq(2)
+  end
+
+  it "allows delimiters of any length" do
+    expect(StringCalculator.new("//[***]\n1***2***3").add).to eq(6)
   end
 
 end
