@@ -6,9 +6,14 @@ class StringCalculator
   end
 
   def add
+    negatives = []
     result = @string.split(/[\n,#{@delimiter}]/).inject(0) do |sum, num|
-      raise "Negatives not allowed" if num.to_i < 0
-      sum += num.to_i
+      negatives << num.strip if num.to_i < 0
+      sum += num.to_i if num.to_i <= 1000
+      sum
+    end
+    if negatives.size > 0
+      raise "Negatives not allowed (#{negatives.join(", ")})"
     end
     result
   end
@@ -29,7 +34,15 @@ RSpec.describe "string_calculator_text" do
   end
 
   it "handles negative numbers" do
-    expect{StringCalculator.new("10, 0, -42").add}.to raise_error("Negatives not allowed")
+    calc = StringCalculator.new("10, 0, -42")
+
+    expect{calc.add}.to raise_error(/Negatives not allowed/)
+    expect{calc.add}.to raise_error("Negatives not allowed (-42)")
+  end
+
+  it "handles multiple negative numbers" do
+    expect{ StringCalculator.new("-10, -90, -80, 8" ).add}.to raise_error(
+    "Negatives not allowed (-10, -90, -80)")
   end
 
   it "allows new lines to be a delimiter" do
@@ -38,6 +51,10 @@ RSpec.describe "string_calculator_text" do
 
   it "allows you to configure your own delimiters" do
     expect(StringCalculator.new("//;\n1;2").add).to eq(3)
+  end
+
+  it "ignores numbers that are greater than 1000" do
+    expect(StringCalculator.new("2,1001").add).to eq(2)
   end
 
 end
