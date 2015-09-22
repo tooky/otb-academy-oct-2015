@@ -8,7 +8,7 @@ class StringCalculator
 
   def add
     negatives = []
-    result = @string.split(/[\n,#{Regexp.escape(@delimiter.to_s)}]/).inject(0) do |sum, num|
+    result = @string.split(/[\n,#{Regexp.escape(@delimiters.join)}]/).inject(0) do |sum, num|
       negatives << num.strip if num.to_i < 0
       sum += num.to_i if num.to_i <= 1000
       sum
