@@ -1,3 +1,39 @@
+class Book
+	attr_reader :title
+
+	def initialize(title)
+		@title = title
+	end
+
+	def price
+		8
+	end
+end
+
+class ShoppingBasket
+	def add_items(new_items)
+		basket.concat(new_items)
+	end
+
+	def total 
+		@basket.inject(0) do |running_total, item|
+			running_total + item.price
+		end
+	end
+
+	private
+
+	def basket
+		@basket ||= []
+	end
+end
+
+hp_1 = Book.new("Harry Potter and the Philosopher's Stone")
+hp_2 = Book.new("Harry Potter and the Chamber of Secrets")
+hp_3 = Book.new("Harry Potter and the Prisoner of Azkaban")
+hp_4 = Book.new("Harry Potter and the Goblet of Fire")
+hp_5 = Book.new("Harry Potter and the Order of the Phoenix")
+
 RSpec.describe "Harry Potter special" do
   before(:each) do
     @basket = ShoppingBasket.new
