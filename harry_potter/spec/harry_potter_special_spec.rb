@@ -15,16 +15,54 @@ class ShoppingBasket
 		basket.concat(new_items)
 	end
 
-	def total 
-		@basket.inject(0) do |running_total, item|
-			running_total + item.price
-		end
+	def total 		
+		discountable_items_total + non_discountable_items_total
 	end
 
 	private
 
 	def basket
 		@basket ||= []
+	end
+
+	def discountable_items 
+		items = basket.uniq { |item| [item.title] }.flatten
+		if items.size > 1
+			items
+		else
+			[]
+		end
+	end	
+
+	def non_discountable_items
+		basket.reject { |item| discountable_items.include?(item) }
+	end
+
+	def discountable_items_total
+		items_total(discountable_items) * discount_rate(discountable_items.size)
+	end
+
+	def non_discountable_items_total
+		items_total(non_discountable_items)
+	end
+
+	def items_total(items) 
+		items.inject(0) do |running_total, item|
+			running_total + item.price
+		end
+	end
+
+	def discount_rate(count)
+		(100 - discount_rates.fetch(count, 0)) / 100.0
+	end
+
+	def discount_rates
+		{
+			2 => 5, 
+			3 => 10,
+			4 => 20,
+			5 => 25,
+		}
 	end
 end
 
