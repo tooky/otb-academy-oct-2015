@@ -10,5 +10,7 @@ def book_discount_calculator(book_list)
 		21.6
 	elsif book_list.size == 4
 		28.8
-	end	
+	elsif book_list.size == 5
+		30
+	end
 end
