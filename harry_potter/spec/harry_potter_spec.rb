@@ -23,5 +23,9 @@ RSpec.describe "Harry potter book discount" do
 	it "applies a 25% discount when 4 books are passed in" do
 		expect(book_discount_calculator([1,1,1,1,1])).to eq(30) 
 	end
+
+	it "returns normal price when two of the same books are passed in" do
+		expect(book_discount_calculator([2])).to eq(16)
+	end
   
 end
