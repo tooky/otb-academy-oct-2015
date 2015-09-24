@@ -45,8 +45,12 @@ module Shop
       base_price - (base_price * discount)
     end
 
-    def cheapest_price
-      sets.map { |_, v| v.map(&:price).inject(:+) }.min
+    def tier_prices
+      sets.map { |_, v| v.map(&:price).inject(:+) }
+    end
+
+    def best_price
+      tier_prices.min
     end
 
     def sets
@@ -70,31 +74,39 @@ module Shop
     def find_all_sets( books )
       tier_sets = Hash.new(BookList.new())
 
-      Shop::DISCOUNT_TIERS.downto(1) do |max_set_size|
-        books_clone = books.clone
-        all_sets    = []
-
-        until books_clone.empty? do
-          # Find nearest set, store remaining books
-          set       = []
-          remaining = []
-
-          books_clone.each do |book|
-            if set.include?(book) || set.size >= max_set_size
-              remaining << book
-            else
-              set << book
-            end
-          end
-
-          books_clone = remaining
-          all_sets << BookList.new(set)
-        end
-
-        tier_sets[max_set_size] = all_sets
+      Shop::DISCOUNT_TIERS.downto(1) do |tier|
+        tier_sets[tier] = find_sets_for_tier(books.clone, tier)
       end
 
       tier_sets
+    end
+
+    def find_sets_for_tier( books, tier )
+      all_sets = []
+
+      until books.empty? do
+        result = find_set( books, tier )
+
+        books = result[:remaining]
+        all_sets << BookList.new(result[:set])
+      end
+
+      all_sets
+    end
+
+    def find_set( books, tier = Shop::DISCOUNT_TIERS )
+      set       = []
+      remaining = []
+
+      books.each do |book|
+        if set.include?(book) || set.size >= tier
+          remaining << book
+        else
+          set << book
+        end
+      end
+
+      { set: set, remaining: remaining }
     end
   end
 end
@@ -102,7 +114,7 @@ end
 def book_prices( books )
   list = Shop::BookList.new( books )
 
-  list.cheapest_price
+  list.best_price
 end
 
 RSpec.describe "harry potter" do
@@ -126,7 +138,15 @@ RSpec.describe "harry potter" do
     expect( book_prices([ 1, 2, 3, 3 ]) ).to eq( 29.6 )
   end
 
-  it "should cost 51.20 GBP to buy a bunch of books" do
+  it "should choose the best deal with multiple discounts" do
     expect( book_prices([ 1, 1, 2, 2, 3, 3, 4, 5 ]) ).to eq( 51.20 )
+
+    expect( book_prices([
+      1, 1, 1, 1, 1,
+      2, 2, 2, 2, 2,
+      3, 3, 3, 3,
+      4, 4, 4, 4, 4,
+      5, 5, 5, 5
+    ]) ).to eq( 141.2 ) # 3 * (8 * 5 * 0.75) + 2 * (8 * 4 * 0.8)
   end
 end
