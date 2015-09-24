@@ -22,16 +22,73 @@ module ArryPotta
 
     DISCOUNTS[books] * 0.01
   end
+
+  def self.find_sets(all)
+    return [] if all.empty?
+
+    # [1, 1, 2, 2, 3, 3, 4, 5]
+
+    sets = []
+
+    until all.empty? do
+      set_options = find_set(all, verbose: true)
+
+      all = set_options[:remaining]
+      sets << set_options[:set]
+    end
+
+    sets
+  end # find_sets(...)
+
+  def self.find_set(all, verbose: false)
+    set = []
+    remaining = []
+
+    max_set_size = 4
+
+    all.each do |v|
+      if set.include?(v) || set.size >= max_set_size
+        remaining << v
+      else
+        set << v
+      end
+    end
+
+    if verbose
+      { remaining: remaining, set: set }
+    else
+      set
+    end
+  end
+end # module
+
+def fs(*args)
+  ArryPotta::find_set(*args)
 end
 
 def book_prices(books)
   total_price ||= 0
-  unique_books = books.uniq
 
-  discount = ArryPotta::get_discount(unique_books.size)
-  total_price = books.size * ArryPotta::BASE_PRICE
+  sets = ArryPotta::find_sets(books)
 
-  total_price - (total_price * discount)
+  sets.each do |set|
+    price = 0
+    discount = 0
+
+    if (set.size > 1)
+      # Set of books
+      discount = ArryPotta::get_discount(set.size)
+      base_price = ArryPotta::BASE_PRICE * set.size
+      price = base_price - (base_price * discount)
+    else
+      # Single book
+      price = ArryPotta::BASE_PRICE
+    end
+
+    total_price += price
+  end
+
+  total_price
 end
 
 RSpec.describe "harry potter" do
@@ -52,8 +109,11 @@ RSpec.describe "harry potter" do
     expect( book_prices([ 1, 2, 3 ]) ).to eq( 21.6 )
   end
 
+  it "should cost 29.6 GBP (10% + 8 GBP) to buy 4 books, 3 unique" do
+    expect( book_prices([ 1, 2, 3, 3 ]) ).to eq( 29.6 )
+  end
+
   it "should cost 51.20 GBP to buy a bunch of books" do
-    # dev;binding.pry
     expect( book_prices([ 1, 1, 2, 2, 3, 3, 4, 5 ]) ).to eq( 51.20 )
   end
 end
