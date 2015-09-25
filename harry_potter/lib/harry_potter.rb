@@ -6,31 +6,21 @@ def book_discount_calculator(books_list)
 	return 0 if books_list.empty?
 	@books_list = books_list
 	book_count = @books_list.max
-	puts @books_list
-	puts " book count is #{book_count}"
-	i = 0
 
 	book_count.times do
 		@books_list.delete(0)
-		puts @books_list.inspect
 		if special_case
-			puts "in"
 			@books_list = special_discount
 		else
-			puts "in h"
 			discounter
 		end
-		puts @books_list.inspect
-		i =+ 1
 	end
 	@price
 end
 
 def discounter
-	puts "in di"
 	puts @books_list.inspect
 	@price += (8 * books_count) * DISCOUNT[books_count]
-	puts "price is #{@price}"
 	@books_list.map! { |book| book -= 1}
 end
 
@@ -39,9 +29,8 @@ def books_count
 	@books_list.size
 end
 
-
-
 def total_books
+	
 	@books_list.inject(0) { |sum, num| sum += num}
 end
 
@@ -54,7 +43,7 @@ def special_discount
 	@price += (4 * 8) * 0.8 
 	return books_list
 end
-puts book_discount_calculator([5, 5, 4, 5, 4])
+puts book_discount_calculator([5,5,4,2,1])
 
 
 
