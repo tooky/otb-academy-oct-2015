@@ -1,3 +1,10 @@
+#########################################################################
+# Harry Potter Kata (with Ruby and RSpec)
+# Ruby Academy - Autumn 2015
+# On The Beach
+# M. Kim
+#########################################################################
+#Definition of HPspecial class
 class HPspecial
     #Discount rates
     @@discount = {2=>0.95, 3=>0.9, 4=>0.8, 5=>0.75}
@@ -15,7 +22,7 @@ class HPspecial
     #Defines which method to use to calculate the final price
     #a. basket_greedy
     #b. basket_greedy_modified
-    #c. basket_tree
+    #c. basket_tree (recursive)
     def basket
         #self.basket_greedy
         #self.basket_greedy_modified
@@ -194,3 +201,4 @@ RSpec.describe "#Harry Potter Special#" do
 #EndRSpec test
 end
 #EndFile
+#########################################################################
