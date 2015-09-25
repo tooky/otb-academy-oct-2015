@@ -1,94 +1,102 @@
 class HPspecial
+    #Discount rates
     @@discount = {2=>0.95, 3=>0.9, 4=>0.8, 5=>0.75}
+    #Initializes the instance and builds a hash to store the input
     def initialize(purchase)
         @purchase = purchase
         @purchase_hash = Hash.new(0)
         @purchase.each do |p|
             @purchase_hash[p] += 1
         end
+        @special_price = 0
     end
     #Defines which method to use to calculate the final price
+    #a. basket_greedy
+    #b. basket_greedy_modified
+    #c. basket_tree
     def basket
-        return self.basket_greedy_modified
+        self.basket_greedy
+        return @special_price
     end
-    def uniq
-        return @purchase_hash.values.count{|x| x > 0}
+    #Accessory methods
+    #a. uniq
+    #b. proceed
+    #c. remains
+    #returns the number of unique series
+    def uniq(h=@purchase_hash)
+        return h.values.count{|x| x > 0}
     end
+    #decreases the number of each series by one, if there is any
     def proceed
         @purchase_hash.each{|k,v| @purchase_hash[k] -= 1 if v > 0}
     end
+    #returns the number of remaining books that no discounts will be applied to
     def remains
-        sum = @purchase_hash.values.inject(0) do |sum, v|
-            if v > 0
-                sum + v
-            else
-                sum
-            end
-        end
-        return sum
+        return @purchase_hash.values.select{|c| c > 0}.inject(0, :+)
     end
     #basket_greedy
-    #Calculates the final price in a greedy way
-    #Discounts will be applied in an order of discount rates
+    # -calculates the final price in a greedy way
+    # -discounts will be applied in an order of discount rates
     def basket_greedy
         run = true
-        special_price = 0
         while run
             uniq = self.uniq
             if uniq > 1
-                special_price += 8*uniq*@@discount[uniq]
+                @special_price += 8*uniq*@@discount[uniq]
                 self.proceed        
             else
-                remains = self.remains #@purchase_hash.values.inject(:+)
-                special_price += 8*remains
+                @special_price += 8*self.remains
                 run = false
             end
         end
-        special_price
     end
-    #basket_greedy
-    #Basically same as 'basket_greedy', but it prefers 'two 'four-different-books' discount
-    def try_discount(count)
-        if count == 5
-            try_hash = @purchase_hash.clone
-            purchase_sorted = try_hash.sort_by{|ep,n| n}.reverse
-            (0..3).each do |here|
-                try_hash[purchase_sorted[here][0]] -= 1
-            end
-            count = try_hash.values.count{|x| x > 0}
-            if count >= 4
-                purchase_sorted = try_hash.sort_by{|ep,n| n}.reverse
-                (0..3).each do |here|
-                    try_hash[purchase_sorted[here][0]] -= 1
-                end
-                @purchase_hash = try_hash
-                return true
-            end
-        end
-        return false
-    end
+    #basket_greedy_modified
+    # -basically same as 'basket_greedy'
+    # -but it prefers 'two 'four-different-books' discount
     def basket_greedy_modified
         run = true
-        special_price = 0
         while run
             uniq = self.uniq
             if uniq > 1
-                #two 'four-diff-books' discounts
-                try = self.try_discount(uniq)
-                if try
-                    special_price += 2*8*4*@@discount[4]
+                #try two 'four-diffrent-books' discounts
+                if uniq == 5 && self.try_discount
+                    @special_price += 2*8*4*@@discount[4]
                 else
-                    special_price += 8*uniq*@@discount[uniq]
+                    @special_price += 8*uniq*@@discount[uniq]
                     self.proceed
                 end        
             else
-                remains = self.remains    #purchase_hash.values.inject(:+)
-                special_price += 8*remains #if remains
+                @special_price += 8*self.remains
                 run = false
             end
         end
-        special_price
     end
+    #try_discount
+    #- will be called by basket_greedy_modified 
+    def try_discount
+        #try with a copy of the original data
+        try_hash = @purchase_hash.clone
+        #inner method to proceed 'four-different-books' discount
+        try_four_discount = lambda {
+            purchase_sorted = try_hash.sort_by{|ep,n| n}.reverse
+            (0..3).each{|here| try_hash[purchase_sorted[here][0]] -= 1}
+        }
+        #try the first 'fout-different-books' discount
+        try_four_discount.call
+        uniq = self.uniq(try_hash)
+        #if the second 'four-different-books' discount is possible,
+        #it'll overdo 'five-different-books' discount
+        if uniq >= 4
+            try_four_discount.call
+            #if successful, the original data will be updated to 'try_hash' 
+            @purchase_hash = try_hash
+            return true
+        end
+        return false
+    end
+    #basket_tree
+    #- tries every possible discount
+    #- returns the minimum price 
     def basket_tree
     
     end
