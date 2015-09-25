@@ -9,14 +9,16 @@ class HPspecial
             @purchase_hash[p] += 1
         end
         @special_price = 0
+        #used by basktet_three
+        @minp = 8*purchase.length
     end
     #Defines which method to use to calculate the final price
     #a. basket_greedy
     #b. basket_greedy_modified
     #c. basket_tree
     def basket
-        self.basket_greedy
-        return @special_price
+        self.basket_tree(@purchase_hash, [], 0)
+        return @minp
     end
     #Accessory methods
     #a. uniq
@@ -31,8 +33,8 @@ class HPspecial
         @purchase_hash.each{|k,v| @purchase_hash[k] -= 1 if v > 0}
     end
     #returns the number of remaining books that no discounts will be applied to
-    def remains
-        return @purchase_hash.values.select{|c| c > 0}.inject(0, :+)
+    def remains(h=@purchase_hash)
+        return h.values.select{|c| c > 0}.inject(0, :+)
     end
     #basket_greedy
     # -calculates the final price in a greedy way
@@ -85,7 +87,7 @@ class HPspecial
         try_four_discount.call
         uniq = self.uniq(try_hash)
         #if the second 'four-different-books' discount is possible,
-        #it'll overdo 'five-different-books' discount
+        #it'll replace 'five-different-books' discount
         if uniq >= 4
             try_four_discount.call
             #if successful, the original data will be updated to 'try_hash' 
@@ -95,11 +97,30 @@ class HPspecial
         return false
     end
     #basket_tree
-    #- tries every possible discount
-    #- returns the minimum price 
-    def basket_tree
-    
+    #- updates the minimum price while trying every possible discount
+    def basket_tree(input, result, price)
+        uniq = self.uniq(input)
+        if uniq < 2
+            result.push(-1)
+            price += 8*self.remains(input)
+            @minp = price < @minp ? price : @minp
+            return result
+        else
+            (2..uniq).each do |i|
+                h = Hash.new
+                h = input.clone
+                price_a = price + i*8*@@discount[i]
+                self.basket_tree(self.choose(h,i), result.push(i), price_a)
+            end
+        end
+        return result 
     end
+    def choose(input, i)
+        input_sorted = input.sort_by{|ep,n| n}.reverse
+        (0..i-1).each{|here| input[input_sorted[here][0]] -= 1}
+        return input
+    end
+    #EndMethodDef
 end
 
         
