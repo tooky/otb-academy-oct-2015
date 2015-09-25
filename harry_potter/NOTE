@@ -6,20 +6,33 @@
 #########################################################################
 
 Environment
-. ruby 2.0.0p481 (2014-05-08 revision 45883) [universal.x86_64-darwin14]
+. Ruby
+  - ruby 2.0.0p481 (2014-05-08 revision 45883) [universal.x86_64-darwin14]
 . RSpec
 . Mac OS 10.10.5
 
 Assumptions
 . Input format
+  - Each book will be represented by its series number; 1,2,3,4 and 5
+  - Inputs will be a list of the books to checkout
+    i.e., 1 of the first book and 2 of the second book will be represented as [1,2,2]  
 . Input validation
+  - It is assumed that inputs are always valid. (No validation implemented) 
 
-Implementation
-.  
+Approaches
+. Implemented the basket method in three different ways;
+  - 'basket_greedy'
+  it 
+  - 'basket_greedy_modified'
+  - 'basket_tree'
 
-Result
+Implementation:
+
+Results and analysis
 .
 
+Limitations and futurework
+.
 
 
 
