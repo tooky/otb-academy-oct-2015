@@ -68,4 +68,15 @@ RSpec.describe "Harry Potter special" do
     ])
     expect(basket.total).to eq(113.6)
   end
+
+  it "can handle baskets with books in any order" do
+    basket = ShoppingBasket.new([
+      hp_1, hp_1, hp_1, hp_1, hp_1,
+      hp_2, hp_2, hp_2, hp_2, hp_2,
+      hp_3, hp_3, hp_3, hp_3,
+      hp_4, hp_4,
+      hp_5
+    ].shuffle)
+    expect(basket.total).to eq(113.6)
+  end
 end
