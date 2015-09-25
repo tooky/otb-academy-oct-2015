@@ -8,7 +8,7 @@ class HPspecial
         @purchase.each do |p|
             @purchase_hash[p] += 1
         end
-        @special_price = 0
+        #@special_price = 0
         #used by basktet_three
         @minp = 8*purchase.length
     end
@@ -17,6 +17,8 @@ class HPspecial
     #b. basket_greedy_modified
     #c. basket_tree
     def basket
+        #self.basket_greedy
+        #self.basket_greedy_modified
         self.basket_tree(@purchase_hash, [], 0)
         return @minp
     end
@@ -40,14 +42,15 @@ class HPspecial
     # -calculates the final price in a greedy way
     # -discounts will be applied in an order of discount rates
     def basket_greedy
+        @minp = 0
         run = true
         while run
             uniq = self.uniq
             if uniq > 1
-                @special_price += 8*uniq*@@discount[uniq]
+                @minp += 8*uniq*@@discount[uniq]
                 self.proceed        
             else
-                @special_price += 8*self.remains
+                @minp += 8*self.remains
                 run = false
             end
         end
@@ -56,19 +59,20 @@ class HPspecial
     # -basically same as 'basket_greedy'
     # -but it prefers 'two 'four-different-books' discount
     def basket_greedy_modified
+        @minp = 0
         run = true
         while run
             uniq = self.uniq
             if uniq > 1
                 #try two 'four-diffrent-books' discounts
                 if uniq == 5 && self.try_discount
-                    @special_price += 2*8*4*@@discount[4]
+                    @minp += 2*8*4*@@discount[4]
                 else
-                    @special_price += 8*uniq*@@discount[uniq]
+                    @minp += 8*uniq*@@discount[uniq]
                     self.proceed
                 end        
             else
-                @special_price += 8*self.remains
+                @minp += 8*self.remains
                 run = false
             end
         end
@@ -100,30 +104,43 @@ class HPspecial
     #- updates the minimum price while trying every possible discount
     def basket_tree(input, result, price)
         uniq = self.uniq(input)
+        #if there are no more uniq series
         if uniq < 2
+            #add '-1' to the trajectory
             result.push(-1)
+            #add the price of the remains to the final price
             price += 8*self.remains(input)
-            @minp = price < @minp ? price : @minp
+            #update the minimum price
+            @minp = [price, @minp].min
+            return result
+        #For each possible discount, it tries calculating its final price
+        elsif price > @minp
             return result
         else
             (2..uniq).each do |i|
+                #tries the next node with a copy of the parent node
                 h = Hash.new
                 h = input.clone
+                #tries the next price with a copy of thr price of the parent node
                 price_a = price + i*8*@@discount[i]
-                self.basket_tree(self.choose(h,i), result.push(i), price_a)
+                #recursively tries the next nodes
+                self.basket_tree(self.next_node(h,i), result.push(i), price_a)
             end
         end
         return result 
     end
-    def choose(input, i)
+    #next_node
+    #- will be called by basket_tree 
+    def next_node(input, i)
         input_sorted = input.sort_by{|ep,n| n}.reverse
         (0..i-1).each{|here| input[input_sorted[here][0]] -= 1}
         return input
     end
     #EndMethodDef
 end
+#EndClassHPspecial
 
-        
+#TEST cases        
 RSpec.describe "#Harry Potter Special#" do
     #0 book
     it "returns 0 if you don't buy any books" do
@@ -157,17 +174,23 @@ RSpec.describe "#Harry Potter Special#" do
     it "returns 8*2 + 8*2*0.95 if you buy three same books and one other book" do
         expect(HPspecial.new([1,1,1,2]).basket).to eq(8*2 + 8*2*0.95)
     end
-    it "returns 8*2*0.95 + 8*2*0.95 if you two same books and two other same  books" do
+    it "returns 8*2*0.95 + 8*2*0.95 if you two same books and two other same books" do
         expect(HPspecial.new([1,1,2,2]).basket).to eq(2*8*2*0.95)
     end
-    it "returns 8*3*0.9 + 8 if you buy three different books" do
+    it "returns 8*3*0.9 + 8 if you buy three different books and one other book" do
         expect(HPspecial.new([1,1,2,3]).basket).to eq(8*3*0.9 + 8)
     end
-    it "returns 8*4*0.8 if you buy three different books" do
+    it "returns 8*4*0.8 if you buy four different books" do
         expect(HPspecial.new([1,2,3,4]).basket).to eq(8*4*0.8)
     end
-    #given test scenario
-    it "given scenario" do
+    #given test cases
+    it "test case by Steve" do
         expect(HPspecial.new([1,1,2,2,3,3,4,5]).basket).to eq(51.2)
     end
+    it "test case by Michael" do
+        expect(HPspecial.new([1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,5,5,5,5]).basket).to eq(141.2)
+    end
+    #EndTestCase
+#EndRSpec test
 end
+#EndFile
