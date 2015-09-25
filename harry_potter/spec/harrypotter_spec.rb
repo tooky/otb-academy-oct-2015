@@ -3,15 +3,21 @@ class HPspecial
     def initialize(purchase)
         @purchase = purchase
         @purchase_hash = Hash.new(0)
-        @purchase_list = [0, 0, 0, 0, 0, 0]
+        #€purchase_list = [0, 0, 0, 0, 0, 0]
         @purchase.each do |p|
             @purchase_hash[p] += 1
-            @purchase_list[p] += 1
+          #  @purchase_list[p] += 1
         end
     end
     #Defines which method to use to calculate the final price
     def basket
-        return self.basket_tree
+        return self.basket_greedy_modified
+    end
+    def uniq
+        return @purchase_hash.values.count{|x| x > 0}
+    end
+    def proceed
+        @purchase_hash.each{|k,v| @purchase_hash[k] -= 1 if v > 0}
     end
     #basket_greedy
     #Calculates the final price in a greedy way
@@ -20,10 +26,11 @@ class HPspecial
         run = true
         special_price = 0
         while run
-            count = @purchase_list.count{|x| x > 0}
-            if count > 1
-                special_price += 8*count*@@discount[count]
-                @purchase_list = @purchase_list.map{|item| item -= 1 }        
+            uniq = self.uniq
+            if uniq > 1   #count > 1
+                special_price += 8*uniq*@@discount[uniq]   #[count]
+                self.proceed
+                #@purchase_list = @purchase_list.map{|item| item -= 1 }        
             else
                 remains = @purchase_hash.values.inject(:+)
                 special_price += 8*remains if remains
@@ -57,15 +64,17 @@ class HPspecial
         run = true
         special_price = 0
         while run
-            count = @purchase_hash.values.count{|x| x > 0}
-            if count > 1
+            uniq = self.uniq
+            #count = @purchase_hash.values.count{|x| x > 0}
+            if uniq > 1
                 #two 'four-diff-books' discounts
-                try = self.try_discount(count)
+                try = self.try_discount(uniq)
                 if try
                     special_price += 2*8*4*@@discount[4]
                 else
-                    special_price += 8*count*@@discount[count]
-                    @purchase_hash.each{|k,v| @purchase_hash[k] -= 1 }
+                    special_price += 8*uniq*@@discount[uniq]
+                    self.proceed
+                    #@purchase_hash.each{|k,v| @purchase_hash[k] -= 1 if v > 0}
                 end        
             else
                 remains = @purchase_hash.values.inject(:+)
