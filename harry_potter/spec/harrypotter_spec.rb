@@ -1,5 +1,6 @@
 #########################################################################
 # Harry Potter Kata (with Ruby and RSpec)
+# harrypotter_spec.rb
 # Ruby Academy - Autumn 2015
 # On The Beach
 # M. Kim

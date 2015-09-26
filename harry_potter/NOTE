@@ -1,5 +1,6 @@
 #########################################################################
 # Harry Potter Kata (with Ruby and RSpec)
+# NOTE
 # Ruby Academy - Autumn 2015
 # On The Beach
 # M. Kim
@@ -13,28 +14,30 @@ Environment
 
 Assumptions
 . Input format
-  - Each book will be represented by its series number; 1,2,3,4 and 5
-  - Inputs will be a list of the books to checkout
+  - Inputs will be a list of the books to checkout and each book will be represented by its seried number; 1, 2, 3, 4,and 5
     i.e., 1 of the first book and 2 of the second book will be represented as [1,2,2]  
 . Input validation
-  - It is assumed that inputs are always valid. (No validation implemented) 
+  - It is assumed that inputs are always valid. 
 
 Approaches
-. Implemented the basket method in three different ways;
-  - 'basket_greedy'
-  it 
-  - 'basket_greedy_modified'
-  - 'basket_tree'
+. Test driven using RSpec and implemented and three different ways
+  - Step 1. ('basket_greedy' method)
+Starting from 0 book (an empty list, []), increased the number of books and tried all the combinations. Trying up to 4 books, implemented a method so discounts can be chosen in a greedy way where ones with a greater rate will be applied first and this decision won't change in the future.
+  - Step 2. ('basket_greedy_modified' method)
+For the example given in the project specification, [1,1,2,2,3,3,4,5], it applies 'five-different-books' discount and then 'three-different-books' for those 8 books which results in 51.60 GBP. However, applying 'four-different-books' discount twice will sum up to 51.20 GBP which is the cheapest final price.
+'basket_greedy_modified' method, based on the previous implementation, when it finds five different books, instead of applying 'five-different-books' discount immediately, tries 'four-different-books' discount twice. If this alternative discount is possible, it'll proceed and if not, it'll take 'five-different-books' discount.
+  - Step 3. ('basket_tree' method)
+For a more complicated example, such as, [1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,5,5,5,5], none of the previous methods works. 'basket_tree' method is implemented to try all the possible discount option and return the minimum price which is 141.2 GBP for this case.
 
-Implementation:
-
-Results and analysis
-.
-
-Limitations and futurework
-.
-
-
-
-
+Test cases and results
+. All the three methods passes;
+  - 0 book; []
+  - 1 book; [1]
+  - 2 books; [1,1], [1,2]
+  - 3 books; [1,1,1], [1,1,2], [1,2,3]
+  - 4 books; [1,1,1,1], [1,1,1,2], [1,1,2,2,] [1,1,2,3], [1,2,3,4]
+. Only 'basket_greedy_modified' and 'basket_tree' pass; 
+  - [1,1,2,2,3,3,4,5]
+. Only 'basket_tree' passes;
+  [1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,5,5,5,5]
 #EndNote
