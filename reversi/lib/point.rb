@@ -10,6 +10,9 @@ class Point
     Point.new(@x + point.x, @y + point.y)
   end
 
+  def ==(point)
+    return @x == point.x && @y == point.y
+  end
   def to_s
     "(#{@x}, #{@y})"
   end

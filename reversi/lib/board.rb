@@ -12,8 +12,19 @@ class Board
   end
 
   def char_at(position)
-    return nil if [position.x, position.y].max >= @board.count
+    return nil if [position.x, position.y].max >= size
     return @board[position.y][position.x]
+  end
+
+  def all(char)
+    result = []
+    @board.each_index do |index_y|
+      @board[index_y].each_index do |index_x|
+        value = @board[index_y][index_x]
+        result << Point.new(index_x, index_y) if value == char
+      end
+    end
+    result
   end
 
   def to_s
@@ -24,6 +35,10 @@ class Board
   def parse(input)
     @turn = input[-1, 1]
     @board = multi_array_from(input.chop.chomp, "\n")
+  end
+
+  def size
+    @board.count
   end
 
   def multi_array_from(string, end_line)
