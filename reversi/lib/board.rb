@@ -11,7 +11,7 @@ class Board
     @board[position.y][position.x] = char
   end
 
-  def obj_at(position)
+  def char_at(position)
     return nil if [position.x, position.y].max >= @board.count
     return @board[position.y][position.x]
   end
@@ -19,7 +19,7 @@ class Board
   def to_s
     @board.map { |e| e.join('')  }.join("\n")
   end
-  
+
   private
   def parse(input)
     @turn = input[-1, 1]

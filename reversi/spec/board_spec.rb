@@ -29,7 +29,7 @@ B') }
   end
 
   it "Reads chars at position" do
-    char = board.obj_at(Point.new(3, 3))
+    char = board.char_at(Point.new(3, 3))
     expect(char).to eq "B"
   end
 
@@ -43,7 +43,7 @@ B') }
 ........
 ........'
     board.set_char('0', Point.new(2, 2))
-    char = board.obj_at(Point.new(2, 2))
+    char = board.char_at(Point.new(2, 2))
     expect(char).to eq "0"
     expect(board.to_s).to eq expected_output
   end
