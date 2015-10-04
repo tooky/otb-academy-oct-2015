@@ -20,7 +20,8 @@ B') }
 ...WB...
 ........
 ........
-........'
+........
+B'
     expect(board.to_s).to eq expected_output
   end
 
@@ -41,11 +42,19 @@ B') }
 ...WB...
 ........
 ........
-........'
+........
+B'
     board.set_char('0', Point.new(2, 2))
     char = board.char_at(Point.new(2, 2))
     expect(char).to eq "0"
     expect(board.to_s).to eq expected_output
+  end
+
+  it "Finds all positions of a specific char" do
+    positions = board.all("B")
+    expect(positions.count).to eq(2)
+    expect(positions.include?(Point.new(3, 3))).to be_truthy
+    expect(positions.include?(Point.new(4, 4))).to be_truthy
   end
 
 

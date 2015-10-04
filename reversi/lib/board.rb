@@ -28,7 +28,7 @@ class Board
   end
 
   def to_s
-    @board.map { |e| e.join('')  }.join("\n")
+    @board.map { |e| e.join('')  }.join("\n") + "\n#{@turn}"
   end
 
   private
