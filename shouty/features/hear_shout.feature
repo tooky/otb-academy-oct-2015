@@ -1,5 +1,7 @@
 Feature: Hear Shout
 
-  A description goes here...
+  In order to find out whats going on locally
+  As a shouty subscriber
+  I want to hear shouts in my area
 
-  Scenario: ????
+  Scenario: Listener is within range
