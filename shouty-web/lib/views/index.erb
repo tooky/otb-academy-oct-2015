@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <h1>Hello <%= person.name %></h1>
+
+    <div id="last_heard_message"><%= person.last_heard_message %></div>
+
+    <form method="post">
+      <label for="message">Message</label>
+      <input type="text" name="message" value="" id="message">
+      <input type="submit" value="Shout!">
+    </form>
+  </body>
+</html>
